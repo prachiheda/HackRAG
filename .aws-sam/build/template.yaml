@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Hackathon search backend
+Globals:
+  Function:
+    Timeout: 15
+    Runtime: nodejs18.x
+Resources:
+  SearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: SearchFunction
+      Handler: lambda.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /search
+            Method: post
+            RestApiId:
+              Ref: SearchApi
+      Environment:
+        Variables:
+          PINECONE_API_KEY: YOUR_PINECONE_KEY
+    Metadata:
+      SamResourceId: SearchFunction
+  SearchApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: HackathonSearchApi
+      StageName: prod
+      Cors:
+        AllowMethods: '''POST,OPTIONS'''
+        AllowHeaders: '''Content-Type'''
+        AllowOrigin: '''*'''
