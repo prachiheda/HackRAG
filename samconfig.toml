@@ -8,3 +8,4 @@ region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
 image_repositories = []
+parameter_overrides = "PineconeSecretArn=\"arn:aws:secretsmanager:us-east-1:861164748234:secret:PineconeApiKey-bnQoaH\""

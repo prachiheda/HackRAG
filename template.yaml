@@ -2,28 +2,17 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Hackathon search backend
 
+Parameters:
+  PineconeSecretArn:
+    Type: String
+    Description: ARN of the Pinecone secret in us‑east‑1
+
 Globals:
   Function:
     Timeout: 15
     Runtime: nodejs18.x
 
 Resources:
-  SearchFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: backend/
-      Handler: lambda.handler
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /search
-            Method: post
-            RestApiId: !Ref SearchApi
-      Environment:
-        Variables:
-          PINECONE_API_KEY: YOUR_PINECONE_KEY
-
   SearchApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -33,3 +22,26 @@ Resources:
         AllowMethods: "'POST,OPTIONS'"
         AllowHeaders: "'Content-Type'"
         AllowOrigin: "'*'"
+
+  SearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: lambda.handler
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Ref PineconeSecretArn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /search
+            Method: post
+            RestApiId: !Ref SearchApi
+      Environment:
+        Variables:
+          PINECONE_SECRET_NAME: !Ref PineconeSecretArn
